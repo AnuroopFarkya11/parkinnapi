@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:parkinnapi/api_services.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -18,6 +19,9 @@ class HomeScreen extends StatelessWidget {
                 child: ListTile(
                   title: Text("Get"),
                   subtitle: Text("fetching the users data"),
+                  onTap: () async{
+                    await API.getAll();
+                  },
                 ),
               ),
             )
