@@ -9,6 +9,21 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("ParkInn APIs"),
       ),
+      body: Container(
+        child: Column(
+          children: [
+            Card(
+              elevation: 20,
+              child: Card(
+                child: ListTile(
+                  title: Text("Get"),
+                  subtitle: Text("fetching the users data"),
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 }
