@@ -33,31 +33,7 @@ class API {
         allCustomersDynamicList = json.decode(response.body);
 
         customerList = allCustomersDynamicList.map((object) {
-          List<dynamic> tempVehicleList = object['vehicles'];
-          List<dynamic> tempAllVehicleList = object['allVehicles'];
 
-          vehicleList = tempVehicleList.map((tempVehicle) {
-            return Vehicle(
-                vehicleNumber: tempVehicle['vehicleNumber'],
-                vehicleType: tempVehicle['vehicleType'],
-                date: tempVehicle['createDate']);
-          }).toList();
-          log(
-              name: "GetAll API:",
-              "Vehicle list received :${vehicleList.length}");
-
-          allVehicleList = tempAllVehicleList.map((tempVehicle) {
-            return Vehicle(
-                vehicleNumber: tempVehicle['vehicleNumber'],
-                vehicleType: tempVehicle['vehicleType'],
-                date: tempVehicle['createDate']);
-          }).toList();
-
-          log(
-              name: "GetAll API:",
-              "AllVehicle list received :${allVehicleList.length}");
-
-          // object['vehicle']
           return Customer(
               mobileNumber: object['mobileNumber'],
               customerId: object['customerId'],
