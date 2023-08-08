@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
 import '../../Modals/customer_modal.dart';
+import '../../Modals/transaction_modal.dart';
 import '../../Modals/vehicle_modal.dart';
 
 class API {
@@ -311,4 +312,16 @@ class API {
     return vehicleList;
 
   }
+
+  // static List<Transaction> decodeHistory({required List<dynamic> list})
+  // {
+  //   List<Transaction> historyList = list.map((transaction){
+  //     return Transaction(
+  //       : transaction['mobileNumber']
+  //
+  //     );
+  //   }).toList();
+  // }
+
+
 }
