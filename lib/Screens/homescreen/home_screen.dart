@@ -4,6 +4,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:parkinnapi/Screens/add_vehicle/add_vehicle.dart';
 import 'package:parkinnapi/Screens/getAllCustomer/get_all_customer.dart';
 import 'package:parkinnapi/Screens/loginCustomer/login_customer_screen.dart';
+import 'package:parkinnapi/Screens/remove_screen/remove_screen.dart';
 import '../createcustomer/customer_screen.dart';
 import 'home_controller.dart';
 
@@ -58,6 +59,18 @@ class HomeScreen extends StatelessWidget {
                 },
               ),
             ),
+            Card(
+              elevation: 20,
+              child: ListTile(
+                title: const Text("Remove Vehicle"),
+                onTap: () {
+                  Get.to(() => RemoveScreen() );
+                },
+              ),
+            ),
+
+
+
           ],
         ),
       ),

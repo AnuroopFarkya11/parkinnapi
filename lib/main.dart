@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:parkinnapi/Services/shared_preference/shared_preference_services.dart';
 
 import 'Screens/homescreen/home_screen.dart';
 
 
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await SharedService.initializePreferences();
   runApp(const MyApp());
 }
 
