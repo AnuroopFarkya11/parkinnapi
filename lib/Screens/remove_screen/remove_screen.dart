@@ -58,7 +58,7 @@ class _RemoveScreenState extends State<RemoveScreen> {
         title: Text("Remove Vehicle"),
       ),
       body: Container(
-        padding: EdgeInsets.all(12),
+        // padding: EdgeInsets.all(12),
         child: status == true
             ? FutureBuilder(
                 future: API.getCustomerAllVehicles(
@@ -66,12 +66,31 @@ class _RemoveScreenState extends State<RemoveScreen> {
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     return ListView.builder(
-                      padding: EdgeInsets.all(12),
+                      padding: EdgeInsets.all(10),
                         itemCount: snapshot.data!.length,
                         itemBuilder: (context, index) {
                           return ListTile(
                             title: Text(snapshot.data![index].vehicleNumber),
-                            trailing: Text(snapshot.data![index].vehicleType),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(snapshot.data![index].vehicleType),
+                                IconButton(onPressed: ()async{
+
+                                  Map<String,String> removeBody = {
+                                    "mobileNumber": custNumber,
+                                    "customerId": custId,
+                                    "vehicleType": snapshot.data![index].vehicleType,
+                                    "vehicleNumber": snapshot.data![index].vehicleNumber
+                                  };
+                                  await API.removeVehicle(removeBody).whenComplete((){setState(() {
+
+                                  });});
+
+
+                                }, icon: Icon(Icons.delete))
+                              ],
+                            ),
                             subtitle: Text(snapshot.data![index].date),
                           );
                         });

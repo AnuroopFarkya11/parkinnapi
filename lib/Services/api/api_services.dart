@@ -34,7 +34,6 @@ class API {
         allCustomersDynamicList = json.decode(response.body);
 
         customerList = allCustomersDynamicList.map((object) {
-
           return Customer(
               mobileNumber: object['mobileNumber'],
               customerId: object['customerId'],
@@ -58,36 +57,21 @@ class API {
   }
 
   static Future<Customer> createUser(String mobileNumber, String otp) async {
-    Customer customer;
     log(name: "LOGIN USER API:", "CALLED");
+
     Map<String, dynamic> requestBody = {
       "mobileNumber": mobileNumber,
       "otp": otp
     };
+
     const url = "$defaultAPI/api/customer";
     Uri finalUrl = Uri.parse(url);
+
     try {
       var response = await client.post(finalUrl, body: requestBody);
       if (response.statusCode == 200) {
         log(name: "CREATE USER API:", "RESPONSE RECEIVED SUCCESSFULLY!");
-
-        Map<dynamic, dynamic> data = json.decode(response.body);
-
-
-
-        customer = Customer(
-            mobileNumber: data['mobileNumber'],
-            customerId: data['customerId'],
-            balance: data['balance'],
-            currentTransaction: data['currentTransaction'],
-            vehicles: decodeVehicleList(list: data['vehicles']),
-            allVehicles: decodeVehicleList(list: data['allVehicles']),
-            history: data['history'],
-            createDate: data['createDate']);
-
-        log(name: "CREATE USER API:", "$customer");
-
-        return customer;
+        return decodeCustomer(response);
       } else {
         log(
             name: "CREATE USER API:",
@@ -104,65 +88,33 @@ class API {
 
   static Future<Customer> loginUser(
       String mobileNumber, String customerId) async {
-    Customer customer;
     log(name: "LOGIN USER API:", "CALLED");
+
+    Customer customer;
+
     Map<String, dynamic> requestBody = {
       "mobileNumber": mobileNumber,
       "customerId": customerId
     };
+
     const url = "$defaultAPI/api/customer";
     Uri finalUrl = Uri.parse(url);
+
     try {
       var response = await client.post(finalUrl, body: requestBody);
       if (response.statusCode == 200) {
         log(name: "LOGIN USER API:", "RESPONSE RECEIVED SUCCESSFULLY!");
-        Map<dynamic, dynamic> data = json.decode(response.body);
 
         // todo umm failure pr bhi map aa rha hai , jisme status: failure hai. now agr login successful hai toh status naam se attribute hi nhi hai
         // OKAY GOT MY ANSWER: basically cust_id is not a password tht a user must remember, it will be stored uin cache memory!
-        if (data.length == 2) {
-          log(name: "LOGIN USER API:", "INVALID CREDENTIALS");
+
+        try {
+          customer = decodeCustomer(response);
+        } catch (e) {
+          log(name: "LOGIN USER API:", "$e");
           throw "Invalid Credentials";
-          // login failed due to invalid credential
         }
 
-        // todo Make a global function for converting list of vehicles from dynamic to vehicle type
-        List<dynamic> tempVehicleList = data['vehicles'];
-        List<dynamic> tempAllVehicleList = data['allVehicles'];
-
-        List<Vehicle> vehicleList = tempVehicleList.map((tempVehicle) {
-          return Vehicle(
-              vehicleNumber: tempVehicle['vehicleNumber'],
-              vehicleType: tempVehicle['vehicleType'],
-              date: tempVehicle['createDate']);
-        }).toList();
-
-        log(
-            name: "Get Customer API:",
-            "Vehicle list received :${vehicleList.length}");
-
-        List<Vehicle> allVehicleList = tempAllVehicleList.map((tempVehicle) {
-          return Vehicle(
-              vehicleNumber: tempVehicle['vehicleNumber'],
-              vehicleType: tempVehicle['vehicleType'],
-              date: tempVehicle['createDate']);
-        }).toList();
-
-        log(
-            name: "Get Customer API:",
-            "AllVehicle list received :${allVehicleList.length}");
-
-        customer = Customer(
-            mobileNumber: data['mobileNumber'],
-            customerId: data['customerId'],
-            balance: data['balance'],
-            currentTransaction: data['currentTransaction'],
-            vehicles: vehicleList,
-            allVehicles: allVehicleList,
-            history: data['history'],
-            createDate: data['createDate']);
-
-        log(name: "LOGIN USER API:", "$customer");
         return customer;
       } else {
         log(name: "LOGIN USER API:", "RESPONSE FAILED: ${response.statusCode}");
@@ -179,7 +131,8 @@ class API {
       required String customerId,
       required String vehicleType,
       required String vehicleNumber}) async {
-    Customer customer;
+    log(name: "ADD VEHICLE API", "CALLED");
+
     const String url = "$defaultAPI/api/vehicle/add";
     Uri finalUrl = Uri.parse(url);
 
@@ -193,78 +146,57 @@ class API {
     try {
       Response response = await client.post(finalUrl, body: request);
       if (response.statusCode == 200) {
-        Map<dynamic, dynamic> data = json.decode(response.body);
-
-        if (data.length == 2) {
-          throw "Operation failed";
-        }
-
-        List<dynamic> tempVehicleList = data['vehicles'];
-        List<dynamic> tempAllVehicleList = data['allVehicles'];
-
-        List<Vehicle> vehicleList = tempVehicleList.map((tempVehicle) {
-          return Vehicle(
-              vehicleNumber: tempVehicle['vehicleNumber'],
-              vehicleType: tempVehicle['vehicleType'],
-              date: tempVehicle['createDate']);
-        }).toList();
-
-        log(
-            name: "Add Vehicle API",
-            "Vehicle list received :${vehicleList.length}");
-
-        List<Vehicle> allVehicleList = tempAllVehicleList.map((tempVehicle) {
-          return Vehicle(
-              vehicleNumber: tempVehicle['vehicleNumber'],
-              vehicleType: tempVehicle['vehicleType'],
-              date: tempVehicle['createDate']);
-        }).toList();
-
-        log(
-            name: "Add Vehicle API",
-            "AllVehicle list received :${allVehicleList.length}");
-
-        customer = Customer(
-            mobileNumber: data['mobileNumber'],
-            customerId: data['customerId'],
-            balance: data['balance'],
-            currentTransaction: data['currentTransaction'],
-            vehicles: vehicleList,
-            allVehicles: allVehicleList,
-            history: data['history'],
-            createDate: data['createDate']);
+        log(name: "ADD VEHICLE API", "RESPONSE RECEIVED");
+        return decodeCustomer(response);
       } else {
         throw "Response failed ${response.statusCode}";
       }
     } on Exception catch (e) {
       throw "Response failed";
     }
-
-    return customer;
   }
 
+  // TODO IMPLEMENT A API WHICH DIRECTLY GIVES THE LIST OF VEHICLES . INSTEAD OF RETURNING THE ENTIRE CUSTOMER
   static Future<List<Vehicle>?> getCustomerAllVehicles(
       {required String customerNumber, required String customerId}) async {
     List<Vehicle>? list;
     try {
       Customer customer = await loginUser(customerNumber, customerId);
-      list = customer.allVehicles;
+      list = customer.vehicles;
     } on Exception catch (e) {
       log(name: "Get Customer All Vehicles", "Exception $e");
     }
     return list;
   }
 
+  static Future<List<Vehicle>?> removeVehicle(
+      Map<String, String> removeBody) async {
+    Customer customer;
+    log(name: "Remove Vehicle","CALLED");
+    String path = "$defaultAPI/api/vehicle/remove";
+    Uri url = Uri.parse(path);
+    try {
+      Response response = await http.post(url, body: removeBody);
+      try {
+        customer = decodeCustomer(response);
+        return customer.vehicles;
+      } catch (e) {
+        log(name: "Remove Vehicle","EXCEPTION :$e");
+      }
+    } on Exception catch (e) {
+      throw "Something went wrong";
+    }
+  }
+
   static Future createTransaction(
       {required Map<String, String> transactionBody}) async {
     // todo make a class that consist of all path
     // todo since user is logged in toh usska data toh preferences me haii
-
     Customer customer;
     String path = "$defaultAPI/api/transaction/create";
     Uri url = Uri.parse(path);
 
-    Response response = await http.put(url, body: transactionBody);
+    Response response = await http.post(url, body: transactionBody);
 
     if (response.statusCode == 200) {
       Map<dynamic, dynamic> data = json.decode(response.body);
@@ -279,6 +211,8 @@ class API {
     }
   }
 
+  //                                        DECODING METHODS
+
   static List<Vehicle> decodeVehicleList({required List<dynamic> list}) {
     List<Vehicle> vehicleList = list.map((tempVehicle) {
       return Vehicle(
@@ -288,19 +222,34 @@ class API {
     }).toList();
 
     return vehicleList;
-
   }
 
-  // todo doubt that what will
-  // static List<Transaction> decodeHistory({required List<dynamic> list})
-  // {
-  //   List<Transaction> historyList = list.map((transaction){
-  //     return Transaction(
-  //       : transaction['mobileNumber']
-  //
-  //     );
-  //   }).toList();
-  // }
+  static Customer decodeCustomer(Response response) {
+    Map<dynamic, dynamic> data = json.decode(response.body);
 
+    if (data.length == 2) {
+      throw "Response failed";
+    }
 
+    return Customer(
+        mobileNumber: data['mobileNumber'],
+        customerId: data['customerId'],
+        balance: data['balance'],
+        currentTransaction: data['currentTransaction'],
+        vehicles: decodeVehicleList(list: data['vehicles']),
+        allVehicles: decodeVehicleList(list: data['allVehicles']),
+        history: data['history'],
+        createDate: data['createDate']);
+  }
+
+// todo doubt that what will
+// static List<Transaction> decodeHistory({required List<dynamic> list})
+// {
+//   List<Transaction> historyList = list.map((transaction){
+//     return Transaction(
+//       : transaction['mobileNumber']
+//
+//     );
+//   }).toList();
+// }
 }
