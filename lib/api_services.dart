@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 class API {
   var client = http.Client();
 
-  Future<dynamic> getAll(String api) async {
+  Future<dynamic> getAll() async {
     String getAllUrl =
         "https://aquamarine-turkey-gear.cyclic.cloud/api/customer/getAll";
     var url = Uri.parse(getAllUrl);

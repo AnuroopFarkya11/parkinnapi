@@ -20,7 +20,7 @@ class HomeScreen extends StatelessWidget {
                   title: Text("Get"),
                   subtitle: Text("fetching the users data"),
                   onTap: () async{
-                    await API.getAll();
+                    await API().getAll();
                   },
                 ),
               ),
