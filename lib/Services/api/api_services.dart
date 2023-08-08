@@ -63,8 +63,8 @@ class API {
               customerId: object['customerId'],
               balance: object['balance'],
               currentTransaction: object['currentTransaction'],
-              vehicles: vehicleList,
-              allVehicles: allVehicleList,
+              vehicles: decodeVehicleList(list: object['vehicles']),
+              allVehicles: decodeVehicleList(list: object['allVehicles']),
               history: object['history'],
               createDate: object['createDate']);
         }).toList();
@@ -300,8 +300,8 @@ class API {
     return list;
   }
 
-  static Future createTransaction({required Map<String,String> transactionBody}) async{
-
+  static Future createTransaction(
+      {required Map<String, String> transactionBody}) async {
     // todo make a class that consist of all path
     // todo since user is logged in toh usska data toh preferences me haii
 
@@ -309,37 +309,30 @@ class API {
     String path = "$defaultAPI/api/transaction/create";
     Uri url = Uri.parse(path);
 
-    Response response = await http.put(url,body: transactionBody);
+    Response response = await http.put(url, body: transactionBody);
 
-    if(response.statusCode == 200)
-      {
+    if (response.statusCode == 200) {
+      Map<dynamic, dynamic> data = json.decode(response.body);
 
-        Map<dynamic,dynamic> data = json.decode(response.body);
-
-        if(data.length == 2)
-          {
-            throw "Transaction failed";
-          }
-
-        customer = Customer(
-
-        );
-
-
+      if (data.length == 2) {
+        throw "Transaction failed";
       }
-    else{
+
+      customer = Customer();
+    } else {
       throw "Failed to load response";
     }
-
-
-
   }
 
+  static List<Vehicle> decodeVehicleList({required List<dynamic> list}) {
+    List<Vehicle> vehicleList = list.map((tempVehicle) {
+      return Vehicle(
+          vehicleNumber: tempVehicle['vehicleNumber'],
+          vehicleType: tempVehicle['vehicleType'],
+          date: tempVehicle['createDate']);
+    }).toList();
 
-  // List<Vehicle> decodeVehicleList({required List<dynamic> list})
-  // {
-  //   Lis
-  // }
+    return vehicleList;
 
-
+  }
 }
