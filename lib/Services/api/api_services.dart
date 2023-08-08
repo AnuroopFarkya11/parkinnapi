@@ -70,40 +70,18 @@ class API {
       var response = await client.post(finalUrl, body: requestBody);
       if (response.statusCode == 200) {
         log(name: "CREATE USER API:", "RESPONSE RECEIVED SUCCESSFULLY!");
+
         Map<dynamic, dynamic> data = json.decode(response.body);
 
-        // todo Make a global function for converting list of vehicles from dynamic to vehicle type
-        List<dynamic> tempVehicleList = data['vehicles'];
-        List<dynamic> tempAllVehicleList = data['allVehicles'];
 
-        List<Vehicle> vehicleList = tempVehicleList.map((tempVehicle) {
-          return Vehicle(
-              vehicleNumber: tempVehicle['vehicleNumber'],
-              vehicleType: tempVehicle['vehicleType'],
-              date: tempVehicle['createDate']);
-        }).toList();
-        log(
-            name: "Get Customer API:",
-            "Vehicle list received :${vehicleList.length}");
-
-        List<Vehicle> allVehicleList = tempAllVehicleList.map((tempVehicle) {
-          return Vehicle(
-              vehicleNumber: tempVehicle['vehicleNumber'],
-              vehicleType: tempVehicle['vehicleType'],
-              date: tempVehicle['createDate']);
-        }).toList();
-
-        log(
-            name: "Get Customer API:",
-            "AllVehicle list received :${allVehicleList.length}");
 
         customer = Customer(
             mobileNumber: data['mobileNumber'],
             customerId: data['customerId'],
             balance: data['balance'],
             currentTransaction: data['currentTransaction'],
-            vehicles: vehicleList,
-            allVehicles: allVehicleList,
+            vehicles: decodeVehicleList(list: data['vehicles']),
+            allVehicles: decodeVehicleList(list: data['allVehicles']),
             history: data['history'],
             createDate: data['createDate']);
 
@@ -313,6 +291,7 @@ class API {
 
   }
 
+  // todo doubt that what will
   // static List<Transaction> decodeHistory({required List<dynamic> list})
   // {
   //   List<Transaction> historyList = list.map((transaction){
