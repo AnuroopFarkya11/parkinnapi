@@ -31,7 +31,6 @@ class HomeScreen extends StatelessWidget {
                 },
               ),
             ),
-
             Card(
               elevation: 20,
               child: ListTile(
@@ -55,7 +54,7 @@ class HomeScreen extends StatelessWidget {
               child: ListTile(
                 title: const Text("Add Vehicle"),
                 onTap: () {
-                  Get.to(() => AddVehicles() );
+                  Get.to(() => AddVehicles());
                 },
               ),
             ),
@@ -64,13 +63,19 @@ class HomeScreen extends StatelessWidget {
               child: ListTile(
                 title: const Text("Remove Vehicle"),
                 onTap: () {
-                  Get.to(() => RemoveScreen() );
+                  Get.to(() => RemoveScreen());
                 },
               ),
             ),
-
-
-
+            Card(
+              elevation: 20,
+              child: ListTile(
+                title: const Text("Create Transaction"),
+                onTap: () {
+                  Get.to(() => RemoveScreen());
+                },
+              ),
+            ),
           ],
         ),
       ),

@@ -190,7 +190,6 @@ class API {
 
   static Future createTransaction(
       {required Map<String, String> transactionBody}) async {
-    // todo make a class that consist of all path
     // todo since user is logged in toh usska data toh preferences me haii
     Customer customer;
     String path = "$defaultAPI/api/transaction/create";
@@ -199,26 +198,36 @@ class API {
     Response response = await http.post(url, body: transactionBody);
 
     if (response.statusCode == 200) {
-      Map<dynamic, dynamic> data = json.decode(response.body);
 
-      if (data.length == 2) {
-        throw "Transaction failed";
+      try {
+        customer = decodeCustomer(response);
+      } catch (e) {
+        log(name: "CREATE TRANSACTION API"," EXCEPTION $e");
       }
-
-      customer = Customer();
     } else {
       throw "Failed to load response";
     }
   }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   //                                        DECODING METHODS
 
   static List<Vehicle> decodeVehicleList({required List<dynamic> list}) {
     List<Vehicle> vehicleList = list.map((tempVehicle) {
-      return Vehicle(
-          vehicleNumber: tempVehicle['vehicleNumber'],
-          vehicleType: tempVehicle['vehicleType'],
-          date: tempVehicle['createDate']);
+      return decodeVehicle(vehicle: tempVehicle);
     }).toList();
 
     return vehicleList;
@@ -240,6 +249,34 @@ class API {
         allVehicles: decodeVehicleList(list: data['allVehicles']),
         history: data['history'],
         createDate: data['createDate']);
+  }
+
+
+
+
+
+  static Transaction decodeTransaction({required dynamic transaction}){
+
+    return Transaction(
+      transactionId: transaction["transactionId"],
+      vehicleData: decodeVehicle(vehicle: transaction["vehicle"]),
+      startTime: transaction["startTime"],
+      endTime: transaction["endTime"],
+      locationId: transaction["locationId"],
+      amount: transaction["amount"],
+      closingBalance: transaction["closingBalance"],
+      createDate: transaction["createDate"]
+
+    );
+
+  }
+
+
+  static Vehicle decodeVehicle({required vehicle}){
+    return Vehicle(
+        vehicleNumber: vehicle['vehicleNumber'],
+        vehicleType: vehicle['vehicleType'],
+        date: vehicle['createDate']);
   }
 
 // todo doubt that what will

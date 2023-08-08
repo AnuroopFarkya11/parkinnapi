@@ -14,7 +14,7 @@ class Transaction {
   late DateTime? startTime;
   late DateTime? endTime;
   late String? locationId;
-  late int? amount;
+  late int amount;
   late int? closingBalance;
   late DateTime? createDate;
 
@@ -24,7 +24,7 @@ class Transaction {
       this.startTime,
       this.endTime,
       this.locationId,
-      this.amount,
+      this.amount = 0,
       this.closingBalance,
       this.createDate});
 }
