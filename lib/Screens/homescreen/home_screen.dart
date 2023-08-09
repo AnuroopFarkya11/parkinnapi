@@ -5,7 +5,9 @@ import 'package:parkinnapi/Screens/add_vehicle/add_vehicle.dart';
 import 'package:parkinnapi/Screens/getAllCustomer/get_all_customer.dart';
 import 'package:parkinnapi/Screens/loginCustomer/login_customer_screen.dart';
 import 'package:parkinnapi/Screens/remove_screen/remove_screen.dart';
+import 'package:parkinnapi/Screens/transaction_screen/create_transaction.dart';
 import '../createcustomer/customer_screen.dart';
+import '../delete_transaction/delete_transaction.dart';
 import 'home_controller.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -72,7 +74,16 @@ class HomeScreen extends StatelessWidget {
               child: ListTile(
                 title: const Text("Create Transaction"),
                 onTap: () {
-                  Get.to(() => RemoveScreen());
+                  Get.to(() => CreateTransaction());
+                },
+              ),
+            ),
+            Card(
+              elevation: 20,
+              child: ListTile(
+                title: const Text("Delete Transaction"),
+                onTap: () {
+                  Get.to(() => DeleteTransaction());
                 },
               ),
             ),

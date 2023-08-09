@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:intl/intl.dart';
 import 'package:parkinnapi/Modals/customer_modal.dart';
 import 'package:parkinnapi/Modals/vehicle_modal.dart';
 
@@ -56,8 +57,8 @@ class AllCustomerScreen extends StatelessWidget {
                             Text("Customer Id  : ${allCustomers[index].customerId}",textAlign: TextAlign.center),
                             Text("Mobile Number: ${allCustomers[index].mobileNumber} ",textAlign: TextAlign.center),
                             Text("Balance      : ${allCustomers[index].balance} ",textAlign: TextAlign.center),
-                            Text("Date : ${allCustomers[index].createDate} ",textAlign: TextAlign.center),
-
+                            Text("Date : ${DateFormat('yyyy-MM-dd hh:mm:ss a').format(allCustomers[index].createDate!)}",textAlign: TextAlign.center),
+                            Text("Current Transaction: ${allCustomers[index].currentTransaction!=null?allCustomers[index].currentTransaction!.transactionId:null}"),
                             // todo Handle empty data
                             Text("History : ${allCustomers[index].history!.isEmpty? "No past record":allCustomers[index].history} ",textAlign: TextAlign.center),
                             Text("Vehicles : ${allCustomers[index].vehicles!.isEmpty? "No past record":allCustomers[index].vehicles![0].getVehicleNumber.toString()} ",textAlign: TextAlign.center,maxLines: 2,overflow: TextOverflow.ellipsis),

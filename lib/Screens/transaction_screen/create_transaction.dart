@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -5,6 +7,7 @@ import 'package:parkinnapi/Screens/transaction_screen/create_controller.dart';
 
 import '../../Modals/customer_modal.dart';
 import '../../Services/api/api_services.dart';
+import '../../Services/shared_preference/shared_preference_services.dart';
 class CreateTransaction extends StatefulWidget {
   const CreateTransaction({Key? key}) : super(key: key);
 
@@ -14,6 +17,50 @@ class CreateTransaction extends StatefulWidget {
 
 class _CreateTransactionState extends State<CreateTransaction> {
   CreateTransactionController controller = Get.put(CreateTransactionController());
+  bool? status;
+
+  @override
+  void initState()  {
+    super.initState();
+    status = SharedService.checkStatus();
+
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (status == null||status==false) {
+        Get.defaultDialog(
+            barrierDismissible: false,
+            title: "LOGIN WARNING",
+            middleText: "You are not logged in. Do you still wanna continue?!",
+            onConfirm: () {
+              Navigator.pop(context);
+            },
+            onCancel: () {
+              Navigator.pop(context);
+              // Get.off(()=>LoginScreen());
+            });
+      }
+      else if(status==true){
+
+        var data = SharedService.getCustomerData();
+        if(data!=null)
+        {
+          controller.customerIdController.text = data["userId"]!;
+          controller.mobileController.text = data["userNumber"]!;
+        }
+        else{
+          log(name:"Add vehicle","Data load nhi hua");
+        }
+
+
+      }else {
+        // Get.snackbar("Login Status", "You are logged out",snackPosition: SnackPosition.BOTTOM);
+      }
+      // if(userData!=null)
+      // {
+      //   controller.mobileController.text = userData['userId']!;
+      //   controller.customerIdController.text = userData['userNumber']!;
+      // }
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,11 +147,14 @@ class _CreateTransactionState extends State<CreateTransaction> {
                     controller.vehicleTypeKey.currentState!.validate()) {
                   Get.defaultDialog(
                       content: FutureBuilder(
-                          future: API.addVehicle(
-                              mobileNumber:controller.mobileController.text,
-                              customerId:controller.customerIdController.text,
-                              vehicleType:controller.vehicleTypeController.text,
-                              vehicleNumber:controller.vehicleNumberController.text
+                          future: API.createTransaction(
+                            transactionBody: {
+                              "mobileNumber": controller.mobileController.text,
+                              "customerId": controller.customerIdController.text,
+                              "vehicleType": controller.vehicleTypeController.text,
+                              "vehicleNumber": controller.vehicleNumberController.text
+
+                            }
                           ),
                           builder: (builder, snapshot) {
                             if (snapshot.connectionState ==

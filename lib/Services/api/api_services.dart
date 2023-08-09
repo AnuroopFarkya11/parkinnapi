@@ -3,10 +3,14 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:intl/intl.dart';
 
 import '../../Modals/customer_modal.dart';
 import '../../Modals/transaction_modal.dart';
 import '../../Modals/vehicle_modal.dart';
+
+
+// TODO 1170e!u\\v WILL BE GIVEN AS 1170e!u\`v
 
 class API {
   static http.Client client = http.Client();
@@ -34,15 +38,16 @@ class API {
         allCustomersDynamicList = json.decode(response.body);
 
         customerList = allCustomersDynamicList.map((object) {
+          log(name: "GetAll API:","TRANSACTION DATA ${object['currentTransaction']}");
           return Customer(
               mobileNumber: object['mobileNumber'],
               customerId: object['customerId'],
               balance: object['balance'],
-              currentTransaction: object['currentTransaction'],
+              currentTransaction: decodeTransaction(transaction: object['currentTransaction']),
               vehicles: decodeVehicleList(list: object['vehicles']),
               allVehicles: decodeVehicleList(list: object['allVehicles']),
               history: object['history'],
-              createDate: object['createDate']);
+              createDate: decodeTime(time: object['createDate']));
         }).toList();
 
         return customerList;
@@ -188,9 +193,9 @@ class API {
     }
   }
 
-  static Future createTransaction(
+  static Future<Customer> createTransaction(
       {required Map<String, String> transactionBody}) async {
-    // todo since user is logged in toh usska data toh preferences me haii
+
     Customer customer;
     String path = "$defaultAPI/api/transaction/create";
     Uri url = Uri.parse(path);
@@ -201,12 +206,38 @@ class API {
 
       try {
         customer = decodeCustomer(response);
+        return customer;
+
       } catch (e) {
         log(name: "CREATE TRANSACTION API"," EXCEPTION $e");
       }
     } else {
       throw "Failed to load response";
     }
+    return Customer();
+  }
+  static Future<Customer> deleteTransaction(
+      {required Map<String, String> transactionBody}) async {
+
+    Customer customer;
+    String path = "$defaultAPI/api/transaction/delete";
+    Uri url = Uri.parse(path);
+
+    Response response = await http.post(url, body: transactionBody);
+
+    if (response.statusCode == 200) {
+
+      try {
+        customer = decodeCustomer(response);
+        return customer;
+
+      } catch (e) {
+        log(name: "DELETE TRANSACTION API"," EXCEPTION $e");
+      }
+    } else {
+      throw "Failed to load response";
+    }
+    return Customer();
   }
 
 
@@ -244,28 +275,36 @@ class API {
         mobileNumber: data['mobileNumber'],
         customerId: data['customerId'],
         balance: data['balance'],
-        currentTransaction: data['currentTransaction'],
+        currentTransaction:decodeTransaction(transaction: data["currentTransaction"]),
         vehicles: decodeVehicleList(list: data['vehicles']),
         allVehicles: decodeVehicleList(list: data['allVehicles']),
-        history: data['history'],
-        createDate: data['createDate']);
+        history: null,
+        createDate:decodeTime(time: data['createDate'])
+
+    );
   }
 
 
 
 
 
-  static Transaction decodeTransaction({required dynamic transaction}){
+  static Transaction? decodeTransaction({required transaction}){
+    if(transaction==null)
+      {
+        return null;
+      }
 
+
+    log(name:"DECODE TRANSACTION",transaction.toString());
     return Transaction(
       transactionId: transaction["transactionId"],
-      vehicleData: decodeVehicle(vehicle: transaction["vehicle"]),
+      vehicleData:true?null: decodeVehicle(vehicle: transaction["vehicle"]),
       startTime: transaction["startTime"],
       endTime: transaction["endTime"],
       locationId: transaction["locationId"],
       amount: transaction["amount"],
       closingBalance: transaction["closingBalance"],
-      createDate: transaction["createDate"]
+      createDate: true?transaction["createDate"]:decodeTime(time: transaction["createDate"])
 
     );
 
@@ -277,6 +316,20 @@ class API {
         vehicleNumber: vehicle['vehicleNumber'],
         vehicleType: vehicle['vehicleType'],
         date: vehicle['createDate']);
+  }
+
+
+  static DateTime? decodeTime({required  time}){
+
+    log(name:"DECODE DATE TIME","TTC TIME $time");
+    DateTime utcTime = DateTime.parse(time);
+
+    DateTime istTime = utcTime.add(const Duration(hours: 5,minutes: 30));
+
+    String formattedIST = DateFormat('yyyy-MM-dd hh:mm:ss a').format(istTime);
+
+    return istTime;
+
   }
 
 // todo doubt that what will

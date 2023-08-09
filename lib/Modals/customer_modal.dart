@@ -12,7 +12,8 @@ class Customer {
   List<dynamic>? history;
   // todo convert this transaction type
   Transaction? currentTransaction;
-  String? createDate;
+  // String? createDate;
+  DateTime? createDate;
 
 
 

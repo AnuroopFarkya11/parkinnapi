@@ -11,12 +11,14 @@ import 'package:parkinnapi/Modals/vehicle_modal.dart';
 class Transaction {
   late String? transactionId;
   late Vehicle? vehicleData;
-  late DateTime? startTime;
-  late DateTime? endTime;
+  // todo decode time
+  late String? startTime;
+  late String? endTime;
   late String? locationId;
   late int amount;
   late int? closingBalance;
-  late DateTime? createDate;
+  // todo accept it as date time
+  late String? createDate;
 
   Transaction(
       {this.transactionId,
