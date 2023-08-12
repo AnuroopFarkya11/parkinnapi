@@ -7,8 +7,6 @@ import '../../Modals/customer_modal.dart';
 import '../../Services/api/api_services.dart';
 import 'controller.dart';
 
-
-
 // todo ERROR HANDLING NHI HUI HAIIII
 
 class CustomerScreen extends StatelessWidget {
@@ -31,10 +29,7 @@ class CustomerScreen extends StatelessWidget {
               child: TextFormField(
                 controller: controller.mobileNumberController,
                 keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly
-
-                ],
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 decoration: const InputDecoration(
                     border: OutlineInputBorder(), labelText: "Mobile Number"),
                 validator: (value) {
@@ -55,9 +50,7 @@ class CustomerScreen extends StatelessWidget {
               child: TextFormField(
                 controller: controller.otpNumberController,
                 keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly
-                ],
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 decoration: const InputDecoration(
                     border: OutlineInputBorder(), labelText: "OTP"),
                 validator: (value) {
@@ -77,52 +70,51 @@ class CustomerScreen extends StatelessWidget {
               onPressed: () {
                 if (controller.mobileKey.currentState!.validate() &&
                     controller.otpKey.currentState!.validate()) {
-
-
-
                   Get.defaultDialog(
                       title: "User Detail",
-                      content: FutureBuilder(future: API.createUser(
-                          controller.mobileNumberController.text,
-                          controller.mobileNumberController.text),
-                          builder: (BuildContext context, AsyncSnapshot<Customer> snapshot) {
-                        // todo what does connectionstate.active is responsible
-                        if(snapshot.connectionState==ConnectionState.done)
-                          {
-                            if(snapshot.hasError)
-                              {
-                                return Center(child: Text(snapshot.error.toString()),);
-
+                      content: FutureBuilder(
+                          future: API.createUser(
+                              controller.mobileNumberController.text,
+                              controller.mobileNumberController.text),
+                          builder: (BuildContext context,
+                              AsyncSnapshot<Customer> snapshot) {
+                            // todo what does connectionstate.active is responsible
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              if (snapshot.hasError) {
+                                return Center(
+                                  child: Text(snapshot.error.toString()),
+                                );
                               }
-                            
-                            Customer? customer = snapshot.data;
-                            return Column(
-                              children: [
-                                Text("CUSTOMER NUMBER: ${customer!.mobileNumber}"),
-                                Text("CUSTOMER ID: ${customer.customerId}"),
-                                Text("DATE: ${customer.createDate}"),
-                                Text("BALANCE: ${customer.balance}"),
-                                Text("HISTORY: ${customer.history}"),
-                                Text("CURRENT TRANSACTION: ${customer.currentTransaction}"),
-                                Text("VEHICLES: ${customer.vehicles}",overflow: TextOverflow.ellipsis,),
-                                Text("ALL VEHICLES: ${customer.allVehicles}",overflow: TextOverflow.ellipsis,),
-                              ],
+
+                              Customer? customer = snapshot.data;
+                              return Column(
+                                children: [
+                                  Text(
+                                      "CUSTOMER NUMBER: ${customer!.mobileNumber}"),
+                                  Text("CUSTOMER ID: ${customer.customerId}"),
+                                  Text("DATE: ${customer.createDate}"),
+                                  Text("BALANCE: ${customer.balance}"),
+                                  Text("HISTORY: ${customer.history}"),
+                                  Text(
+                                      "CURRENT TRANSACTION: ${customer.currentTransaction}"),
+                                  Text(
+                                    "VEHICLES: ${customer.vehicles}",
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    "ALL VEHICLES: ${customer.allVehicles}",
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              );
+                            }
+
+                            return Center(
+                              child: CircularProgressIndicator(),
                             );
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                          }
-                        
-                          return Center(child: CircularProgressIndicator(),);
 
-
-
-
-                      /*  if(snapshot.connectionState==ConnectionState.active)
+                            /*  if(snapshot.connectionState==ConnectionState.active)
                           {
                             if(!snapshot.hasError){
                               // todo show an error occurred message at centre
@@ -141,14 +133,7 @@ class CustomerScreen extends StatelessWidget {
                           return Container();
 
                         }*/
-
-
-
-
-                          })
-                  );
-
-
+                          }));
                 }
               },
               child: const Text("Login"),

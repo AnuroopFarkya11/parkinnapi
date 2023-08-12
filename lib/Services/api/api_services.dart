@@ -73,7 +73,7 @@ class API {
     Uri finalUrl = Uri.parse(url);
 
     try {
-      var response = await client.post(finalUrl, body: requestBody);
+      Response response = await client.post(finalUrl, body: requestBody);
       if (response.statusCode == 200) {
         log(name: "CREATE USER API:", "RESPONSE RECEIVED SUCCESSFULLY!");
         return decodeCustomer(response);
