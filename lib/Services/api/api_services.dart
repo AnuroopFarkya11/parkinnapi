@@ -9,14 +9,12 @@ import '../../Modals/customer_modal.dart';
 import '../../Modals/transaction_modal.dart';
 import '../../Modals/vehicle_modal.dart';
 
-
 // TODO 1170e!u\\v WILL BE GIVEN AS 1170e!u\`v
 
 class API {
   static http.Client client = http.Client();
 
-  static const String defaultAPI =
-      "https://aquamarine-turkey-gear.cyclic.cloud";
+  static const String defaultAPI = "54.66.147.216:8080";
 
   // this is a get method will be used to get the list of all the customers
   static Future<List<Customer>> getAllCustomers() async {
@@ -38,12 +36,15 @@ class API {
         allCustomersDynamicList = json.decode(response.body);
 
         customerList = allCustomersDynamicList.map((object) {
-          log(name: "GetAll API:","TRANSACTION DATA ${object['currentTransaction']}");
+          log(
+              name: "GetAll API:",
+              "TRANSACTION DATA ${object['currentTransaction']}");
           return Customer(
               mobileNumber: object['mobileNumber'],
               customerId: object['customerId'],
               balance: object['balance'],
-              currentTransaction: decodeTransaction(transaction: object['currentTransaction']),
+              currentTransaction:
+                  decodeTransaction(transaction: object['currentTransaction']),
               vehicles: decodeVehicleList(list: object['vehicles']),
               allVehicles: decodeVehicleList(list: object['allVehicles']),
               history: object['history'],
@@ -177,7 +178,7 @@ class API {
   static Future<List<Vehicle>?> removeVehicle(
       Map<String, String> removeBody) async {
     Customer customer;
-    log(name: "Remove Vehicle","CALLED");
+    log(name: "Remove Vehicle", "CALLED");
     String path = "$defaultAPI/api/vehicle/remove";
     Uri url = Uri.parse(path);
     try {
@@ -186,7 +187,7 @@ class API {
         customer = decodeCustomer(response);
         return customer.vehicles;
       } catch (e) {
-        log(name: "Remove Vehicle","EXCEPTION :$e");
+        log(name: "Remove Vehicle", "EXCEPTION :$e");
       }
     } on Exception catch (e) {
       throw "Something went wrong";
@@ -195,7 +196,6 @@ class API {
 
   static Future<Customer> createTransaction(
       {required Map<String, String> transactionBody}) async {
-
     Customer customer;
     String path = "$defaultAPI/api/transaction/create";
     Uri url = Uri.parse(path);
@@ -203,22 +203,20 @@ class API {
     Response response = await http.post(url, body: transactionBody);
 
     if (response.statusCode == 200) {
-
       try {
         customer = decodeCustomer(response);
         return customer;
-
       } catch (e) {
-        log(name: "CREATE TRANSACTION API"," EXCEPTION $e");
+        log(name: "CREATE TRANSACTION API", " EXCEPTION $e");
       }
     } else {
       throw "Failed to load response";
     }
     return Customer();
   }
+
   static Future<Customer> deleteTransaction(
       {required Map<String, String> transactionBody}) async {
-
     Customer customer;
     String path = "$defaultAPI/api/transaction/delete";
     Uri url = Uri.parse(path);
@@ -226,13 +224,11 @@ class API {
     Response response = await http.post(url, body: transactionBody);
 
     if (response.statusCode == 200) {
-
       try {
         customer = decodeCustomer(response);
         return customer;
-
       } catch (e) {
-        log(name: "DELETE TRANSACTION API"," EXCEPTION $e");
+        log(name: "DELETE TRANSACTION API", " EXCEPTION $e");
       }
     } else {
       throw "Failed to load response";
@@ -240,19 +236,50 @@ class API {
     return Customer();
   }
 
+  static Future<Customer> startParking (String adminId, String adminPassword,
+      String mobileNumber, String transactionId) async {
+    Uri url = Uri.parse("$defaultAPI/api/admin/startParking");
 
+    try {
+      Response response = await http.post(url, body: {
+        "adminId": adminId,
+        "adminPassword": adminPassword,
+        "mobileNumber": mobileNumber,
+        "transactionId": transactionId,
+      });
 
+      if (response.statusCode == 200) {
+        return decodeCustomer(response);
+      } else {
+        throw "Failed to load response";
+      }
+    }on Exception catch (e) {
+      log(name: "START PARKING API", "Exception $e");
+      throw "RESPONSE failed";
+    }
+  }
+  static Future<Customer> endParking (String adminId, String adminPassword,
+      String mobileNumber, String transactionId) async {
+    Uri url = Uri.parse("$defaultAPI/api/admin/endParking");
 
+    try {
+      Response response = await http.post(url, body: {
+        "adminId": adminId,
+        "adminPassword": adminPassword,
+        "mobileNumber": mobileNumber,
+        "transactionId": transactionId,
+      });
 
-
-
-
-
-
-
-
-
-
+      if (response.statusCode == 200) {
+        return decodeCustomer(response);
+      } else {
+        throw "Failed to load response";
+      }
+    }on Exception catch (e) {
+      log(name: "END PARKING API", "Exception $e");
+      throw "RESPONSE failed";
+    }
+  }
 
   //                                        DECODING METHODS
 
@@ -275,61 +302,50 @@ class API {
         mobileNumber: data['mobileNumber'],
         customerId: data['customerId'],
         balance: data['balance'],
-        currentTransaction:decodeTransaction(transaction: data["currentTransaction"]),
+        currentTransaction:
+            decodeTransaction(transaction: data["currentTransaction"]),
         vehicles: decodeVehicleList(list: data['vehicles']),
         allVehicles: decodeVehicleList(list: data['allVehicles']),
         history: null,
-        createDate:decodeTime(time: data['createDate'])
-
-    );
+        createDate: decodeTime(time: data['createDate']));
   }
 
+  static Transaction? decodeTransaction({required transaction}) {
+    if (transaction == null) {
+      return null;
+    }
 
-
-
-
-  static Transaction? decodeTransaction({required transaction}){
-    if(transaction==null)
-      {
-        return null;
-      }
-
-
-    log(name:"DECODE TRANSACTION",transaction.toString());
+    log(name: "DECODE TRANSACTION", transaction.toString());
     return Transaction(
-      transactionId: transaction["transactionId"],
-      vehicleData:true?null: decodeVehicle(vehicle: transaction["vehicle"]),
-      startTime: transaction["startTime"],
-      endTime: transaction["endTime"],
-      locationId: transaction["locationId"],
-      amount: transaction["amount"],
-      closingBalance: transaction["closingBalance"],
-      createDate: true?transaction["createDate"]:decodeTime(time: transaction["createDate"])
-
-    );
-
+        transactionId: transaction["transactionId"],
+        vehicleData:
+            true ? null : decodeVehicle(vehicle: transaction["vehicle"]),
+        startTime: transaction["startTime"],
+        endTime: transaction["endTime"],
+        locationId: transaction["locationId"],
+        amount: transaction["amount"],
+        closingBalance: transaction["closingBalance"],
+        createDate: true
+            ? transaction["createDate"]
+            : decodeTime(time: transaction["createDate"]));
   }
 
-
-  static Vehicle decodeVehicle({required vehicle}){
+  static Vehicle decodeVehicle({required vehicle}) {
     return Vehicle(
         vehicleNumber: vehicle['vehicleNumber'],
         vehicleType: vehicle['vehicleType'],
         date: vehicle['createDate']);
   }
 
-
-  static DateTime? decodeTime({required  time}){
-
-    log(name:"DECODE DATE TIME","TTC TIME $time");
+  static DateTime? decodeTime({required time}) {
+    log(name: "DECODE DATE TIME", "TTC TIME $time");
     DateTime utcTime = DateTime.parse(time);
 
-    DateTime istTime = utcTime.add(const Duration(hours: 5,minutes: 30));
+    DateTime istTime = utcTime.add(const Duration(hours: 5, minutes: 30));
 
     String formattedIST = DateFormat('yyyy-MM-dd hh:mm:ss a').format(istTime);
 
     return istTime;
-
   }
 
 // todo doubt that what will
