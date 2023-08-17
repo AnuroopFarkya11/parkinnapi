@@ -8,7 +8,7 @@ import '../../Services/api/api_services.dart';
 import 'admin_controller.dart';
 
 class EndParking extends StatelessWidget {
-  const EndParking({Key? key}) : super(key: key);
+  EndParking({Key? key}) : super(key: key);
 
   final AdminController controller = Get.put(AdminController());
 
